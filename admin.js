@@ -123,31 +123,45 @@ async function loadProjects() {
 
 // Handle Move (Reorder)
 async function handleMove(id, direction) {
-    // 1. Get current project
-    const { data: current } = await supabase.from('projects').select('*').eq('id', id).single();
-    if (!current) return;
+    // 1. Fetch ALL projects ordered by current sort_order
+    const { data: projects, error } = await supabase
+        .from('projects')
+        .select('id, sort_order')
+        .order('sort_order', { ascending: true });
 
-    // 2. Get adjacent project
-    let query = supabase.from('projects').select('*');
-
-    if (direction === 'up') {
-        // Find largest sort_order LESS than current
-        query = query.lt('sort_order', current.sort_order).order('sort_order', { ascending: false });
-    } else {
-        // Find smallest sort_order GREATER than current
-        query = query.gt('sort_order', current.sort_order).order('sort_order', { ascending: true });
+    if (error) {
+        console.error('Error fetching projects for reorder:', error);
+        return;
     }
 
-    const { data: adjacent } = await query.limit(1).single();
+    // 2. Find index of current project
+    const currentIndex = projects.findIndex(p => p.id === id);
+    if (currentIndex === -1) return;
 
-    if (adjacent) {
-        // Swap sort_order
-        // We use a temporary value or direct update. Since RLS might be strict, let's do sequential updates.
-        // To avoid unique constraint issues (if any), we might need care, but here sort_order is likely just an int.
+    // 3. Calculate new index
+    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
 
-        await supabase.from('projects').update({ sort_order: adjacent.sort_order }).eq('id', current.id);
-        await supabase.from('projects').update({ sort_order: current.sort_order }).eq('id', adjacent.id);
+    // 4. Check bounds
+    if (newIndex < 0 || newIndex >= projects.length) return;
 
+    // 5. Reorder array in memory
+    const item = projects.splice(currentIndex, 1)[0];
+    projects.splice(newIndex, 0, item);
+
+    // 6. Prepare updates with normalized sort_order (0, 1, 2...)
+    const updates = projects.map((p, index) => ({
+        id: p.id,
+        sort_order: index
+    }));
+
+    // 7. Batch update (Upsert)
+    const { error: updateError } = await supabase
+        .from('projects')
+        .upsert(updates);
+
+    if (updateError) {
+        alert("Error reordering: " + updateError.message);
+    } else {
         loadProjects();
     }
 }

@@ -105,9 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (error) throw error;
 
             if (data && data.length > 0) {
+                console.log('Projects loaded:', data.length);
                 projectsContainer.innerHTML = '';
 
                 data.forEach((project) => {
+                    console.log('Rendering project:', project.title);
                     const card = document.createElement('article');
                     card.className = 'project-card';
                     card.innerHTML = `
