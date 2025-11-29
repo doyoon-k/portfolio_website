@@ -66,12 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!modal) {
             alert('Error: Modal element not found in DOM!');
-            console.error('Modal element is missing');
             return;
         }
 
         console.log('Opening modal for:', project.title);
-        // alert('Opening modal: ' + project.title); // Uncomment if needed
 
         modalBody.innerHTML = `
             ${project.image_url ? `<img src="${project.image_url}" alt="${project.title}" class="modal-image">` : ''}
@@ -80,9 +78,19 @@ document.addEventListener('DOMContentLoaded', () => {
             <p>${project.desc}</p>
         `;
 
-        // Remove hidden class AND set display flex to ensure visibility
+        // Force styles directly via JS to bypass CSS issues
         modal.classList.remove('hidden');
         modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        modal.style.visibility = 'visible';
+        modal.style.zIndex = '10000';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+
         document.body.style.overflow = 'hidden';
     }
 
