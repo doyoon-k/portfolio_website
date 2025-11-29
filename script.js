@@ -8,7 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            const href = this.getAttribute('href');
+            if (href === '#') return; // Ignore empty anchors
+
+            const target = document.querySelector(href);
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth' });
             }
@@ -57,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalClose = document.querySelector('.modal-close');
 
     function openModal(project) {
+        if (!modal) return;
         console.log('Opening modal for:', project.title);
 
         modalBody.innerHTML = `
@@ -73,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function closeModal() {
+        if (!modal) return;
         modal.classList.add('hidden');
         modal.style.display = 'none';
         document.body.style.overflow = '';
@@ -82,12 +87,14 @@ document.addEventListener('DOMContentLoaded', () => {
         modalClose.addEventListener('click', closeModal);
     }
 
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
-    });
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+    }
 
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.style.display === 'flex') {
+        if (e.key === 'Escape' && modal && modal.style.display === 'flex') {
             closeModal();
         }
     });
