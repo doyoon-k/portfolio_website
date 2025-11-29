@@ -61,8 +61,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalClose = document.querySelector('.modal-close');
 
     function openModal(project) {
-        if (!modal) return;
+        const modal = document.getElementById('projectModal');
+        const modalBody = document.getElementById('modalBody');
+
+        if (!modal) {
+            alert('Error: Modal element not found in DOM!');
+            console.error('Modal element is missing');
+            return;
+        }
+
         console.log('Opening modal for:', project.title);
+        // alert('Opening modal: ' + project.title); // Uncomment if needed
 
         modalBody.innerHTML = `
             ${project.image_url ? `<img src="${project.image_url}" alt="${project.title}" class="modal-image">` : ''}
