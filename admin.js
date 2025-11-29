@@ -242,7 +242,7 @@ async function handleDelete(id) {
     const { error } = await supabase
         .from('projects')
         .delete()
-        .eq('id', id);
+        .eq('id', parseInt(id));
 
     if (error) {
         alert("Error deleting: " + error.message);
@@ -253,7 +253,8 @@ async function handleDelete(id) {
 
 // Edit Project
 function handleEdit(id, projects) {
-    const project = projects.find(p => p.id === id);
+    const targetId = parseInt(id);
+    const project = projects.find(p => p.id === targetId);
     if (!project) return;
 
     document.getElementById('projectId').value = project.id;
