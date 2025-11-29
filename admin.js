@@ -78,7 +78,7 @@ async function loadProjects() {
     const { data, error } = await supabase
         .from('projects')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('sort_order', { ascending: true });
 
     if (error) {
         projectsList.innerHTML = '<p>Error loading projects: ' + error.message + '</p>';
@@ -87,13 +87,19 @@ async function loadProjects() {
 
     projectsList.innerHTML = '';
 
-    data.forEach((project) => {
+    data.forEach((project, index) => {
         const item = document.createElement('div');
         item.className = 'project-list-item';
         item.innerHTML = `
-            <div>
-                <h4>${project.title}</h4>
-                <small>${project.stack}</small>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                    <button class="btn secondary-btn move-btn" data-id="${project.id}" data-dir="up" ${index === 0 ? 'disabled' : ''} style="padding: 2px 8px; font-size: 0.8em;">↑</button>
+                    <button class="btn secondary-btn move-btn" data-id="${project.id}" data-dir="down" ${index === data.length - 1 ? 'disabled' : ''} style="padding: 2px 8px; font-size: 0.8em;">↓</button>
+                </div>
+                <div>
+                    <h4>${project.title}</h4>
+                    <small>${project.stack}</small>
+                </div>
             </div>
             <div>
                 <button class="btn secondary-btn edit-btn" data-id="${project.id}">Edit</button>
@@ -110,6 +116,40 @@ async function loadProjects() {
     document.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', (e) => handleEdit(e.target.getAttribute('data-id'), data));
     });
+    document.querySelectorAll('.move-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => handleMove(e.target.getAttribute('data-id'), e.target.getAttribute('data-dir')));
+    });
+}
+
+// Handle Move (Reorder)
+async function handleMove(id, direction) {
+    // 1. Get current project
+    const { data: current } = await supabase.from('projects').select('*').eq('id', id).single();
+    if (!current) return;
+
+    // 2. Get adjacent project
+    let query = supabase.from('projects').select('*');
+
+    if (direction === 'up') {
+        // Find largest sort_order LESS than current
+        query = query.lt('sort_order', current.sort_order).order('sort_order', { ascending: false });
+    } else {
+        // Find smallest sort_order GREATER than current
+        query = query.gt('sort_order', current.sort_order).order('sort_order', { ascending: true });
+    }
+
+    const { data: adjacent } = await query.limit(1).single();
+
+    if (adjacent) {
+        // Swap sort_order
+        // We use a temporary value or direct update. Since RLS might be strict, let's do sequential updates.
+        // To avoid unique constraint issues (if any), we might need care, but here sort_order is likely just an int.
+
+        await supabase.from('projects').update({ sort_order: adjacent.sort_order }).eq('id', current.id);
+        await supabase.from('projects').update({ sort_order: current.sort_order }).eq('id', adjacent.id);
+
+        loadProjects();
+    }
 }
 
 // Save Project (Add or Update)
@@ -156,7 +196,16 @@ projectForm.addEventListener('submit', async (e) => {
             .update(projectData)
             .eq('id', id);
     } else {
-        // Insert
+        // Insert - Calculate new sort_order
+        const { data: maxData } = await supabase
+            .from('projects')
+            .select('sort_order')
+            .order('sort_order', { ascending: false })
+            .limit(1);
+
+        const nextOrder = (maxData && maxData.length > 0) ? maxData[0].sort_order + 1 : 0;
+        projectData.sort_order = nextOrder;
+
         result = await supabase
             .from('projects')
             .insert([projectData]);
