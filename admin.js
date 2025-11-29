@@ -134,8 +134,9 @@ async function handleMove(id, direction) {
         return;
     }
 
-    // 2. Find index of current project
-    const currentIndex = projects.findIndex(p => p.id === id);
+    // 2. Find index of current project (convert id to number for comparison)
+    const targetId = parseInt(id);
+    const currentIndex = projects.findIndex(p => p.id === targetId);
     if (currentIndex === -1) return;
 
     // 3. Calculate new index
