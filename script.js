@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Modal Setup
     const modal = document.getElementById('projectModal');
+    console.log('Modal element found:', modal); // Debug log
     const modalBody = document.getElementById('modalBody');
     const modalClose = document.querySelector('.modal-close');
 
@@ -142,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const btn = card.querySelector('.view-details-btn');
                     btn.addEventListener('click', (e) => {
                         e.preventDefault();
+                        console.log('View Details clicked for:', project.title); // Debug log
                         openModal(project);
                     });
                 });
