@@ -113,7 +113,15 @@
         #livePreview pre  { padding: 1rem; overflow-x: auto; }
         #livePreview ul, #livePreview ol { padding-left: 1.5rem; color: var(--text-secondary); }
         #livePreview blockquote { border-left: 3px solid var(--accent-color); padding-left: 1rem; color: var(--text-secondary); margin: 0.5rem 0; }
-        #livePreview * { color: inherit !important; }
+        #livePreview * {
+            color: var(--text-primary) !important;
+            background-color: transparent !important;
+        }
+        /* Keep code blocks distinct */
+        #livePreview pre, #livePreview code {
+            background: #0a0a0c !important;
+            color: #0ff !important;
+        }
 
         /* Jodit dark override */
         .jodit-container { border-color: #444 !important; }
