@@ -10,6 +10,24 @@ const projectForm = document.getElementById('projectForm');
 const showAddFormBtn = document.getElementById('showAddFormBtn');
 const cancelBtn = document.getElementById('cancelBtn');
 
+// Initialize Quill
+let quill;
+document.addEventListener('DOMContentLoaded', () => {
+    quill = new Quill('#pDescEditor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['link', 'image', 'video'],
+                ['clean']
+            ]
+        }
+    });
+});
+
 // Check Auth State on Load
 supabase.auth.onAuthStateChange((event, session) => {
     console.log('Auth state changed:', event, session);
@@ -65,6 +83,7 @@ showAddFormBtn.addEventListener('click', () => {
     projectForm.reset();
     document.getElementById('projectId').value = '';
     document.getElementById('formTitle').textContent = 'Add Project';
+    if (quill) quill.setContents([]);
 });
 
 cancelBtn.addEventListener('click', () => {
@@ -173,7 +192,7 @@ projectForm.addEventListener('submit', async (e) => {
     const id = document.getElementById('projectId').value;
     const title = document.getElementById('pTitle').value;
     const stack = document.getElementById('pStack').value;
-    const desc = document.getElementById('pDesc').value;
+    const desc = quill ? quill.root.innerHTML : '';
     let imageUrl = document.getElementById('pImageUrl').value;
     const imageFile = document.getElementById('pImageFile').files[0];
 
@@ -260,7 +279,7 @@ function handleEdit(id, projects) {
     document.getElementById('projectId').value = project.id;
     document.getElementById('pTitle').value = project.title;
     document.getElementById('pStack').value = project.stack;
-    document.getElementById('pDesc').value = project.desc;
+    if (quill) quill.root.innerHTML = project.desc || '';
     document.getElementById('pImageUrl').value = project.image_url || '';
 
     document.getElementById('formTitle').textContent = 'Edit Project';
