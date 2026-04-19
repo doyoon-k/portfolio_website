@@ -48,6 +48,22 @@ document.addEventListener('DOMContentLoaded', () => {
         livePreview.innerHTML = html && html.trim()
             ? html
             : '<em style="color:#555">Start editing to see a preview…</em>';
+            
+        // Apply syntax highlighting
+        if (typeof hljs !== 'undefined') {
+            livePreview.querySelectorAll('pre').forEach((block) => {
+                if (!block.querySelector('code')) {
+                    const code = document.createElement('code');
+                    code.className = block.className;
+                    code.innerHTML = block.innerHTML;
+                    block.innerHTML = '';
+                    block.appendChild(code);
+                }
+            });
+            livePreview.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+        }
     });
 });
 
@@ -64,6 +80,22 @@ function setEditorValue(html) {
             livePreview.innerHTML = html && html.trim()
                 ? html
                 : '<em style="color:#555">Start editing to see a preview…</em>';
+                
+            // Apply syntax highlighting
+            if (typeof hljs !== 'undefined') {
+                livePreview.querySelectorAll('pre').forEach((block) => {
+                    if (!block.querySelector('code')) {
+                        const code = document.createElement('code');
+                        code.className = block.className;
+                        code.innerHTML = block.innerHTML;
+                        block.innerHTML = '';
+                        block.appendChild(code);
+                    }
+                });
+                livePreview.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+            }
         }
     }
 }

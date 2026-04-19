@@ -85,6 +85,25 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="rich-content">${project.desc}</div>
         `;
 
+        // Apply syntax highlighting
+        modalBody.querySelectorAll('pre').forEach((block) => {
+            // Check if Tistory gave us a bare <pre> without <code>
+            if (!block.querySelector('code')) {
+                const code = document.createElement('code');
+                code.className = block.className; // inherit language class if any
+                code.innerHTML = block.innerHTML;
+                block.innerHTML = '';
+                block.appendChild(code);
+            }
+        });
+        
+        // Let highlight.js process all code blocks
+        if (typeof hljs !== 'undefined') {
+            modalBody.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+        }
+
         // Force styles directly via JS to bypass CSS issues
         modal.classList.remove('hidden');
         modal.style.display = 'flex';
