@@ -826,7 +826,21 @@ footer {
 
 
 /* Force override inline Tistory styles */
-.rich-content, .rich-content p, .rich-content span, .rich-content div, .rich-content li, .rich-content td { color: var(--text-secondary) !important; background-color: transparent !important; }
-.rich-content h1, .rich-content h2, .rich-content h3, .rich-content h4, .rich-content h5, .rich-content h1 span, .rich-content h2 span, .rich-content h3 span { color: var(--text-primary) !important; background-color: transparent !important; }
-.rich-content code, .rich-content code span { color: var(--accent-cyan) !important; }
-.rich-content pre { background-color: #111115 !important; }
+.rich-content * {
+    color: var(--text-secondary) !important;
+    background-color: transparent !important;
+}
+
+.rich-content h1, .rich-content h2, .rich-content h3, .rich-content h4, .rich-content h5,
+.rich-content h1 *, .rich-content h2 *, .rich-content h3 *, .rich-content h4 *, .rich-content h5 * {
+    color: var(--text-primary) !important;
+}
+
+.rich-content pre, .rich-content code {
+    background-color: #111115 !important;
+    color: var(--accent-cyan) !important;
+}
+
+.rich-content pre *, .rich-content code * {
+    color: var(--accent-cyan) !important;
+}
