@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load Global Site Settings
     async function loadSiteSettings() {
         try {
-            const { data, error } = await window.supabase
+            const { data, error } = await supabase
                 .from('site_settings')
                 .select('*')
                 .eq('id', 1)

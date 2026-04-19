@@ -519,6 +519,7 @@ settingsForm.addEventListener('submit', async (e) => {
     syncSkillsState();
     
     const updatedSettings = {
+        id: 1,
         hero_title1: document.getElementById('sHeroT1').value,
         hero_title2: document.getElementById('sHeroT2').value,
         hero_subtitle: document.getElementById('sHeroSub').value,
@@ -528,7 +529,7 @@ settingsForm.addEventListener('submit', async (e) => {
         skills_json: currentSkills
     };
     
-    const { error } = await supabase.from('site_settings').update(updatedSettings).eq('id', 1);
+    const { error } = await supabase.from('site_settings').upsert(updatedSettings);
     if (error) {
         alert('Failed to save settings: ' + error.message);
     } else {
