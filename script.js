@@ -208,10 +208,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log('Rendering project:', project.title);
                     const card = document.createElement('article');
                     card.className = 'project-card';
+                    let thumbnailHtml = '<div class="placeholder-img"></div>';
+                    
+                    if (project.image_url) {
+                        thumbnailHtml = `<img src="${project.image_url}" alt="${project.title}" style="width:100%; height:100%; object-fit:cover;">`;
+                    } else if (project.desc) {
+                        // Check for Google Drive links in description
+                        const driveMatch = project.desc.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+                        if (driveMatch) {
+                            thumbnailHtml = `<img src="https://drive.google.com/thumbnail?id=${driveMatch[1]}&sz=w800" alt="${project.title}" style="width:100%; height:100%; object-fit:cover;">`;
+                        } else {
+                            // Check for YouTube links just in case
+                            const ytMatch = project.desc.match(/(?:youtube\.com\/embed\/|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+                            if (ytMatch) {
+                                thumbnailHtml = `<img src="https://img.youtube.com/vi/${ytMatch[1]}/maxresdefault.jpg" alt="${project.title}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg';">`;
+                            }
+                        }
+                    }
+
                     const plainTextDesc = extractText(project.desc);
                     card.innerHTML = `
                         <div class="card-image">
-                            ${project.image_url ? `<img src="${project.image_url}" alt="${project.title}" style="width:100%; height:100%; object-fit:cover;">` : '<div class="placeholder-img"></div>'}
+                            ${thumbnailHtml}
                         </div>
                         <div class="card-content">
                             <h3>${project.title}</h3>
