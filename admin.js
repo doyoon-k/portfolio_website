@@ -11,6 +11,58 @@ const showAddFormBtn = document.getElementById('showAddFormBtn');
 const cancelBtn = document.getElementById('cancelBtn');
 
 
+// -------------------------------------------------------
+// Sanitize HTML for the dark-theme editor
+// Tistory inlines black/near-black colors → convert to light grey
+// White backgrounds → transparent
+// -------------------------------------------------------
+function sanitizeHtmlForEditor(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+
+    div.querySelectorAll('[style]').forEach(el => {
+        let style = el.getAttribute('style') || '';
+
+        // rgb(r,g,b) dark colors → light grey
+        style = style.replace(
+            /color:\s*rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/gi,
+            (match, r, g, b) => {
+                if (+r + +g + +b < 200) return 'color: #e0e0e0';
+                return match;
+            }
+        );
+
+        // hex dark colors: #000000 – #2a2a2a style
+        style = style.replace(
+            /color:\s*#([0-9a-f]{3,6})\b/gi,
+            (match, hex) => {
+                const full = hex.length === 3
+                    ? hex.split('').map(c => c + c).join('')
+                    : hex;
+                const r = parseInt(full.substring(0,2),16);
+                const g = parseInt(full.substring(2,4),16);
+                const b = parseInt(full.substring(4,6),16);
+                if (r + g + b < 200) return 'color: #e0e0e0';
+                return match;
+            }
+        );
+
+        // Named black
+        style = style.replace(/\bcolor:\s*(black|#000)\b/gi, 'color: #e0e0e0');
+
+        // Very light/white backgrounds → transparent
+        style = style.replace(
+            /background(?:-color)?:\s*rgb\(\s*(2[0-4]\d|25[0-5])\s*,\s*(2[0-4]\d|25[0-5])\s*,\s*(2[0-4]\d|25[0-5])\s*\)/gi,
+            'background-color: transparent'
+        );
+        style = style.replace(/background(?:-color)?:\s*(white|#fff(fff)?)\b/gi, 'background-color: transparent');
+
+        el.setAttribute('style', style);
+    });
+
+    return div.innerHTML;
+}
+
 // Initialize Quill
 let quill;
 document.addEventListener('DOMContentLoaded', () => {
@@ -30,11 +82,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Live preview: update on every text change
+    // Live preview: update on every text change (show raw saved HTML as site would)
     const livePreview = document.getElementById('livePreview');
     quill.on('text-change', () => {
         const html = quill.root.innerHTML;
-        livePreview.innerHTML = html === '<p><br></p>' ? '<em style="color:#555">Start typing to see your preview here…</em>' : html;
+        livePreview.innerHTML = html === '<p><br></p>'
+            ? '<em style="color:#555">Start typing to see your preview here…</em>'
+            : html;
     });
 });
 
@@ -292,8 +346,9 @@ function handleEdit(id, projects) {
     document.getElementById('pTitle').value = project.title;
     document.getElementById('pStack').value = project.stack;
     if (quill) {
-        quill.root.innerHTML = project.desc || '';
-        // sync initial preview
+        // Sanitize for editor visibility (dark bg compat), but keep original in preview
+        quill.root.innerHTML = sanitizeHtmlForEditor(project.desc || '');
+        // sync initial preview with original (unsanitized) HTML so it matches site appearance
         const livePreview = document.getElementById('livePreview');
         if (livePreview) livePreview.innerHTML = project.desc || '<em style="color:#555">Start typing to see your preview here…</em>';
     }
