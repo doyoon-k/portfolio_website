@@ -292,19 +292,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         .join('');
                 }
 
-                // Update Skills
-                const skillsList = document.querySelector('.skills-list');
-                if (skillsList && data.skills_json && Array.isArray(data.skills_json)) {
-                    skillsList.innerHTML = '';
+                // Update Skills (tag format)
+                const skillTags = document.getElementById('skillTags');
+                if (skillTags && data.skills_json && Array.isArray(data.skills_json)) {
+                    skillTags.innerHTML = '';
                     data.skills_json.forEach(skill => {
-                        skillsList.innerHTML += `
-                            <div class="skill-item">
-                                <span>${skill.name}</span>
-                                <div class="progress-bar">
-                                    <div class="progress" style="width: ${parseInt(skill.level) || 0}%"></div>
-                                </div>
-                            </div>
-                        `;
+                        const name = typeof skill === 'string' ? skill : skill.name;
+                        skillTags.innerHTML += `<span class="skill-tag">${name}</span>`;
                     });
                 }
 
