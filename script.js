@@ -260,8 +260,68 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Load Global Site Settings
+    async function loadSiteSettings() {
+        try {
+            const { data, error } = await window.supabase
+                .from('site_settings')
+                .select('*')
+                .eq('id', 1)
+                .single();
+
+            if (error) throw error;
+            if (data) {
+                // Update Hero
+                const h1 = document.querySelector('.hero-content h1');
+                if (h1) {
+                    h1.innerText = data.hero_title1;
+                    h1.setAttribute('data-text', data.hero_title1);
+                }
+                const h2 = document.querySelector('.hero-content h2');
+                if (h2) h2.innerText = data.hero_title2;
+                
+                const heroSub = document.querySelector('.hero-content p');
+                if (heroSub) heroSub.innerText = data.hero_subtitle;
+
+                // Update About
+                const aboutTextContainer = document.querySelector('.about-text');
+                if (aboutTextContainer && data.about_text) {
+                    aboutTextContainer.innerHTML = data.about_text
+                        .split('\n')
+                        .map(p => p.trim() ? `<p>${p}</p>` : '')
+                        .join('');
+                }
+
+                // Update Skills
+                const skillsList = document.querySelector('.skills-list');
+                if (skillsList && data.skills_json && Array.isArray(data.skills_json)) {
+                    skillsList.innerHTML = '';
+                    data.skills_json.forEach(skill => {
+                        skillsList.innerHTML += `
+                            <div class="skill-item">
+                                <span>${skill.name}</span>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: ${parseInt(skill.level) || 0}%"></div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                // Update Contact
+                const contactTitle = document.querySelector('#contact .section-title');
+                if (contactTitle) contactTitle.innerHTML = data.contact_title;
+                const contactText = document.querySelector('#contact p');
+                if (contactText) contactText.innerText = data.contact_text;
+            }
+        } catch (error) {
+            console.log("Using static settings:", error.message);
+        }
+    }
+
     // Initialize
     if (projectsContainer) {
         loadProjects();
+        loadSiteSettings();
     }
 });

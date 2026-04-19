@@ -230,6 +230,27 @@ logoutBtn.addEventListener('click', async () => {
 // -------------------------------------------------------
 // UI Toggles
 // -------------------------------------------------------
+
+const tabProjects = document.getElementById('tabProjects');
+const tabSettings = document.getElementById('tabSettings');
+const projectsView = document.getElementById('projectsView');
+const settingsView = document.getElementById('settingsView');
+
+tabProjects.addEventListener('click', () => {
+    tabProjects.classList.replace('secondary-btn', 'primary-btn');
+    tabSettings.classList.replace('primary-btn', 'secondary-btn');
+    projectsView.classList.remove('hidden');
+    settingsView.classList.add('hidden');
+});
+
+tabSettings.addEventListener('click', () => {
+    tabSettings.classList.replace('secondary-btn', 'primary-btn');
+    tabProjects.classList.replace('primary-btn', 'secondary-btn');
+    settingsView.classList.remove('hidden');
+    projectsView.classList.add('hidden');
+    loadSettings(); // load settings when tab is clicked
+});
+
 showAddFormBtn.addEventListener('click', () => {
     projectFormContainer.classList.remove('hidden');
     projectForm.reset();
@@ -419,3 +440,98 @@ function handleEdit(id, projects) {
     // Scroll to form
     projectFormContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
+// -------------------------------------------------------
+// Site Settings
+// -------------------------------------------------------
+
+const settingsForm = document.getElementById('settingsForm');
+const skillsContainer = document.getElementById('skillsContainer');
+const addSkillBtn = document.getElementById('addSkillBtn');
+let currentSkills = [];
+
+async function loadSettings() {
+    const { data, error } = await supabase.from('site_settings').select('*').eq('id', 1).single();
+    if (error) {
+        console.error("Error loading settings:", error);
+        return;
+    }
+    
+    if (data) {
+        document.getElementById('sHeroT1').value = data.hero_title1 || '';
+        document.getElementById('sHeroT2').value = data.hero_title2 || '';
+        document.getElementById('sHeroSub').value = data.hero_subtitle || '';
+        document.getElementById('sAboutText').value = data.about_text || '';
+        
+        document.getElementById('sContactTitle').value = data.contact_title || '';
+        document.getElementById('sContactText').value = data.contact_text || '';
+        
+        currentSkills = Array.isArray(data.skills_json) ? data.skills_json : [];
+        renderSkills();
+    }
+}
+
+function renderSkills() {
+    skillsContainer.innerHTML = '';
+    currentSkills.forEach((skill, idx) => {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.gap = '0.5rem';
+        row.style.marginBottom = '0.5rem';
+        row.innerHTML = `
+            <input type="text" placeholder="Skill Name" class="skill-name" value="${skill.name}" style="flex:2;" required>
+            <input type="number" placeholder="Percentage (0-100)" class="skill-level" value="${skill.level}" style="flex:1;" min="0" max="100" required>
+            <button type="button" class="btn secondary-btn remove-skill-btn" data-idx="${idx}" style="border-color:red; color:red; padding: 0 1rem;">X</button>
+        `;
+        skillsContainer.appendChild(row);
+    });
+
+    document.querySelectorAll('.remove-skill-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt(e.target.getAttribute('data-idx'));
+            syncSkillsState();
+            currentSkills.splice(idx, 1);
+            renderSkills();
+        });
+    });
+}
+
+function syncSkillsState() {
+    const names = document.querySelectorAll('.skill-name');
+    const levels = document.querySelectorAll('.skill-level');
+    currentSkills = [];
+    names.forEach((nameInput, i) => {
+        currentSkills.push({
+            name: nameInput.value,
+            level: parseInt(levels[i].value) || 0
+        });
+    });
+}
+
+addSkillBtn.addEventListener('click', () => {
+    syncSkillsState();
+    currentSkills.push({ name: '', level: 50 });
+    renderSkills();
+});
+
+settingsForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    syncSkillsState();
+    
+    const updatedSettings = {
+        hero_title1: document.getElementById('sHeroT1').value,
+        hero_title2: document.getElementById('sHeroT2').value,
+        hero_subtitle: document.getElementById('sHeroSub').value,
+        about_text: document.getElementById('sAboutText').value,
+        contact_title: document.getElementById('sContactTitle').value,
+        contact_text: document.getElementById('sContactText').value,
+        skills_json: currentSkills
+    };
+    
+    const { error } = await supabase.from('site_settings').update(updatedSettings).eq('id', 1);
+    if (error) {
+        alert('Failed to save settings: ' + error.message);
+    } else {
+        alert('Site Settings updated successfully! Refresh the portfolio to see changes.');
+    }
+});

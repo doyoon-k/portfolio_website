@@ -170,13 +170,20 @@
 
     <!-- Dashboard Section -->
     <section id="dashboardSection" class="admin-container hidden">
-        <div class="dashboard-header">
-            <h2>Manage Projects</h2>
-            <button id="showAddFormBtn" class="btn secondary-btn">Add New Project</button>
+        <div class="admin-tabs" style="margin-bottom: 2rem; border-bottom: 2px solid #2a2a2a;">
+            <button id="tabProjects" class="btn primary-btn" style="border-radius: 4px 4px 0 0; margin-right: 0.5rem;">Manage Projects</button>
+            <button id="tabSettings" class="btn secondary-btn" style="border-radius: 4px 4px 0 0;">Site Settings</button>
         </div>
 
-        <!-- Add/Edit Form -->
-        <div id="projectFormContainer" class="hidden">
+        <!--  === PROJECTS VIEW === -->
+        <div id="projectsView">
+            <div class="dashboard-header">
+                <h2>Manage Projects</h2>
+                <button id="showAddFormBtn" class="btn secondary-btn">Add New Project</button>
+            </div>
+
+            <!-- Add/Edit Form -->
+            <div id="projectFormContainer" class="hidden">
             <h3 id="formTitle">Add Project</h3>
             <form id="projectForm">
                 <input type="hidden" id="projectId">
@@ -228,6 +235,64 @@
         <div id="projectsList">
             <!-- Dynamic items will be added here -->
         </div>
+        </div> <!-- End of projectsView -->
+
+        <!-- === SETTINGS VIEW === -->
+        <div id="settingsView" class="hidden">
+            <h3 style="margin-bottom: 1rem;">Global Site Settings</h3>
+            <form id="settingsForm">
+                <!-- Hero Section -->
+                <h4 style="color:var(--accent-cyan); margin-top:1.5rem;">Hero Section</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div class="form-group">
+                        <label>Main Title (Glitch Text)</label>
+                        <input type="text" id="sHeroT1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sub Title</label>
+                        <input type="text" id="sHeroT2" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Hero Description</label>
+                    <input type="text" id="sHeroSub" required>
+                </div>
+
+                <!-- About Section -->
+                <h4 style="color:var(--accent-cyan); margin-top:1.5rem;">About Section</h4>
+                <div class="form-group">
+                    <label>About Description (Use newlines for paragraphs)</label>
+                    <textarea id="sAboutText" rows="4" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label style="display:flex; justify-content:space-between; align-items:center;">
+                        Skills List
+                        <button type="button" id="addSkillBtn" class="btn secondary-btn" style="padding:0.2rem 0.5rem; font-size:0.8rem;">+ Add Skill</button>
+                    </label>
+                    <div id="skillsContainer" style="border:1px solid #333; padding:1rem; border-radius:8px;">
+                        <!-- Skill rows go here -->
+                    </div>
+                </div>
+
+                <!-- Contact Section -->
+                <h4 style="color:var(--accent-cyan); margin-top:1.5rem;">Contact Section</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div class="form-group">
+                        <label>Contact Title (HTML allowed)</label>
+                        <input type="text" id="sContactTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Text</label>
+                        <input type="text" id="sContactText" required>
+                    </div>
+                </div>
+
+                <div style="margin-top:2rem;">
+                    <button type="submit" class="btn primary-btn">Save Settings</button>
+                </div>
+            </form>
+        </div> <!-- End of settingsView -->
     </section>
 
     <script type="module" src="admin.js"></script>
