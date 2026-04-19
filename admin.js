@@ -10,6 +10,7 @@ const projectForm = document.getElementById('projectForm');
 const showAddFormBtn = document.getElementById('showAddFormBtn');
 const cancelBtn = document.getElementById('cancelBtn');
 
+
 // Initialize Quill
 let quill;
 document.addEventListener('DOMContentLoaded', () => {
@@ -19,14 +20,25 @@ document.addEventListener('DOMContentLoaded', () => {
             toolbar: [
                 [{ 'header': [1, 2, 3, false] }],
                 ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
                 ['blockquote', 'code-block'],
                 [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'align': [] }],
                 ['link', 'image', 'video'],
                 ['clean']
             ]
         }
     });
+
+    // Live preview: update on every text change
+    const livePreview = document.getElementById('livePreview');
+    quill.on('text-change', () => {
+        const html = quill.root.innerHTML;
+        livePreview.innerHTML = html === '<p><br></p>' ? '<em style="color:#555">Start typing to see your preview here…</em>' : html;
+    });
 });
+
+
 
 // Check Auth State on Load
 supabase.auth.onAuthStateChange((event, session) => {
@@ -279,7 +291,12 @@ function handleEdit(id, projects) {
     document.getElementById('projectId').value = project.id;
     document.getElementById('pTitle').value = project.title;
     document.getElementById('pStack').value = project.stack;
-    if (quill) quill.root.innerHTML = project.desc || '';
+    if (quill) {
+        quill.root.innerHTML = project.desc || '';
+        // sync initial preview
+        const livePreview = document.getElementById('livePreview');
+        if (livePreview) livePreview.innerHTML = project.desc || '<em style="color:#555">Start typing to see your preview here…</em>';
+    }
     document.getElementById('pImageUrl').value = project.image_url || '';
 
     document.getElementById('formTitle').textContent = 'Edit Project';
