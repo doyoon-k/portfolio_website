@@ -825,10 +825,9 @@ footer {
 
 
 
-/* Force override inline Tistory styles */
-.rich-content * {
-    color: var(--text-secondary) !important;
-    background-color: transparent !important;
+/* Force override inline Tistory styles while protecting Code blocks */
+.rich-content {
+    color: var(--text-secondary);
 }
 
 .rich-content h1, .rich-content h2, .rich-content h3, .rich-content h4, .rich-content h5,
@@ -836,11 +835,31 @@ footer {
     color: var(--text-primary) !important;
 }
 
-.rich-content pre, .rich-content code {
-    background-color: #111115 !important;
-    color: var(--accent-cyan) !important;
+/* Strip generic inline backgrounds from Tistory, but DONT touch code blocks and their child spans */
+.rich-content > *:not(pre):not(code),
+.rich-content > *:not(pre):not(code) * {
+    background-color: transparent !important;
 }
 
-.rich-content pre *, .rich-content code * {
-    color: var(--accent-cyan) !important;
+/* Base colors for non-highlighted text in rich content */
+.rich-content p, .rich-content span, .rich-content div, .rich-content li, .rich-content td {
+    color: var(--text-secondary);
+}
+.rich-content p[style*="color"], .rich-content span[style*="color"], .rich-content div[style*="color"] {
+    color: inherit !important; 
+}
+
+/* Explicitly style pre and code blocks which will be driven by highlight.js */
+.rich-content pre {
+    background: #282c34 !important; /* Atom One Dark BG matching */
+    padding: 1.5rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin: 1.5rem 0;
+}
+
+.rich-content code {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.95rem;
 }

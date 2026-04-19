@@ -45,8 +45,47 @@ document.addEventListener('DOMContentLoaded', () => {
     const livePreview = document.getElementById('livePreview');
     jodit.events.on('change', () => {
         const html = jodit.value;
+        function convertDriveLinksToIframes(htmlStr) {
+            if (!htmlStr) return '';
+            const div = document.createElement('div');
+            div.innerHTML = htmlStr;
+            div.querySelectorAll('a').forEach(a => {
+                const match = a.href.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+                if (match) {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `https://drive.google.com/file/d/${match[1]}/preview`;
+                    iframe.width = "100%";
+                    iframe.height = "480";
+                    iframe.style.border = "none";
+                    iframe.style.borderRadius = "8px";
+                    iframe.style.margin = "1rem 0";
+                    iframe.allowFullscreen = true;
+                    a.replaceWith(iframe);
+                }
+            });
+            const walk = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null, false);
+            const nodesToReplace = [];
+            let n;
+            while(n = walk.nextNode()) {
+                if (n.parentNode && n.parentNode.tagName === 'A') continue;
+                const text = n.nodeValue;
+                const regex = /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/[^\s&<"']*/g;
+                if (regex.test(text)) {
+                    nodesToReplace.push(n);
+                }
+            }
+            nodesToReplace.forEach(n => {
+                const wrapper = document.createElement('span');
+                wrapper.innerHTML = n.nodeValue.replace(/https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/[^\s&<"']*/g, 
+                    '<iframe src="https://drive.google.com/file/d/$1/preview" width="100%" height="480" allowfullscreen style="border:none; border-radius:8px; margin: 1rem 0;"></iframe>'
+                );
+                n.replaceWith(...wrapper.childNodes);
+            });
+            return div.innerHTML;
+        }
+
         livePreview.innerHTML = html && html.trim()
-            ? html
+            ? convertDriveLinksToIframes(html)
             : '<em style="color:#555">Start editing to see a preview…</em>';
             
         // Apply syntax highlighting
@@ -71,6 +110,45 @@ function getEditorValue() {
     return jodit ? jodit.value : '';
 }
 
+function convertDriveLinksToIframes(htmlStr) {
+    if (!htmlStr) return '';
+    const div = document.createElement('div');
+    div.innerHTML = htmlStr;
+    div.querySelectorAll('a').forEach(a => {
+        const match = a.href.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+        if (match) {
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://drive.google.com/file/d/${match[1]}/preview`;
+            iframe.width = "100%";
+            iframe.height = "480";
+            iframe.style.border = "none";
+            iframe.style.borderRadius = "8px";
+            iframe.style.margin = "1rem 0";
+            iframe.allowFullscreen = true;
+            a.replaceWith(iframe);
+        }
+    });
+    const walk = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null, false);
+    const nodesToReplace = [];
+    let n;
+    while(n = walk.nextNode()) {
+        if (n.parentNode && n.parentNode.tagName === 'A') continue;
+        const text = n.nodeValue;
+        const regex = /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/[^\s&<"']*/g;
+        if (regex.test(text)) {
+            nodesToReplace.push(n);
+        }
+    }
+    nodesToReplace.forEach(n => {
+        const wrapper = document.createElement('span');
+        wrapper.innerHTML = n.nodeValue.replace(/https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/[^\s&<"']*/g, 
+            '<iframe src="https://drive.google.com/file/d/$1/preview" width="100%" height="480" allowfullscreen style="border:none; border-radius:8px; margin: 1rem 0;"></iframe>'
+        );
+        n.replaceWith(...wrapper.childNodes);
+    });
+    return div.innerHTML;
+}
+
 function setEditorValue(html) {
     if (jodit) {
         jodit.value = html || '';
@@ -78,7 +156,7 @@ function setEditorValue(html) {
         const livePreview = document.getElementById('livePreview');
         if (livePreview) {
             livePreview.innerHTML = html && html.trim()
-                ? html
+                ? convertDriveLinksToIframes(html)
                 : '<em style="color:#555">Start editing to see a preview…</em>';
                 
             // Apply syntax highlighting

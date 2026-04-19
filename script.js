@@ -78,11 +78,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
         console.log('Opening modal for:', project.title);
 
+        function convertDriveLinksToIframes(htmlStr) {
+            if (!htmlStr) return '';
+            const div = document.createElement('div');
+            div.innerHTML = htmlStr;
+
+            // 1. Replace <a> tags
+            div.querySelectorAll('a').forEach(a => {
+                const match = a.href.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+                if (match) {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `https://drive.google.com/file/d/${match[1]}/preview`;
+                    iframe.width = "100%";
+                    iframe.height = "480";
+                    iframe.style.border = "none";
+                    iframe.style.borderRadius = "8px";
+                    iframe.style.margin = "1rem 0";
+                    iframe.allowFullscreen = true;
+                    a.replaceWith(iframe);
+                }
+            });
+
+            // 2. Replace plain text URLs
+            const walk = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null, false);
+            const nodesToReplace = [];
+            let n;
+            while(n = walk.nextNode()) {
+                if (n.parentNode && n.parentNode.tagName === 'A') continue; // Skip if inside anchor just in case
+                const text = n.nodeValue;
+                const regex = /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/[^\s&<"']*/g;
+                if (regex.test(text)) {
+                    nodesToReplace.push(n);
+                }
+            }
+
+            nodesToReplace.forEach(n => {
+                const wrapper = document.createElement('span');
+                wrapper.innerHTML = n.nodeValue.replace(/https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/[^\s&<"']*/g, 
+                    '<iframe src="https://drive.google.com/file/d/$1/preview" width="100%" height="480" allowfullscreen style="border:none; border-radius:8px; margin: 1rem 0;"></iframe>'
+                );
+                n.replaceWith(...wrapper.childNodes);
+            });
+
+            return div.innerHTML;
+        }
+
         modalBody.innerHTML = `
             ${project.image_url ? `<img src="${project.image_url}" alt="${project.title}" class="modal-image">` : ''}
             <h2>${project.title}</h2>
             <p class="tech-stack">${project.stack}</p>
-            <div class="rich-content">${project.desc}</div>
+            <div class="rich-content">${convertDriveLinksToIframes(project.desc)}</div>
         `;
 
         // Apply syntax highlighting
