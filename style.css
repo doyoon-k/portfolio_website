@@ -357,6 +357,14 @@ a {
     font-size: 0.95rem;
 }
 
+.card-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* About Grid */
 .about-grid {
     display: grid;
@@ -506,6 +514,7 @@ footer {
     color: var(--text-secondary);
     line-height: 1.8;
     font-size: 1.05rem;
+    white-space: pre-wrap;
 }
 
 /* Responsive */

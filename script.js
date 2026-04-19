@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="card-content">
                             <h3>${project.title}</h3>
                             <p class="tech-stack">${project.stack}</p>
-                            <p>${project.desc}</p>
+                            <p class="card-desc">${project.desc}</p>
                             <a href="#" class="btn secondary-btn view-details-btn">View Details</a>
                         </div>
                     `;
