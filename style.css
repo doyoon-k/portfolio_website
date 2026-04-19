@@ -760,3 +760,64 @@ footer {
         opacity: 0 !important;
         visibility: hidden !important;
     }
+
+/* Rich HTML Content styling for the Modal */
+.rich-content {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    font-size: 1.05rem;
+    overflow-x: hidden;
+}
+
+.rich-content p {
+    margin-bottom: 1.5rem;
+}
+
+.rich-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1rem 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.rich-content iframe {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+}
+
+.rich-content ul, .rich-content ol {
+    margin: 1rem 0 1rem 2rem;
+    padding-left: 1rem;
+}
+
+.rich-content li {
+    margin-bottom: 0.5rem;
+}
+
+.rich-content h1, 
+.rich-content h2, 
+.rich-content h3, 
+.rich-content h4, 
+.rich-content h5 {
+    color: var(--text-primary);
+    margin: 2rem 0 1rem 0;
+    font-weight: 600;
+}
+
+.rich-content pre {
+    background: #111115;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 1.5rem 0;
+}
+
+.rich-content code {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.95rem;
+    color: var(--accent-cyan);
+}
+

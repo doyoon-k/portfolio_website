@@ -54,6 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Helper to strip HTML tags for card preview
+    const extractText = (html) => {
+        const tmp = document.createElement("DIV");
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || "";
+    };
+
     // Modal Setup
     const modal = document.getElementById('projectModal');
     console.log('Modal element found:', modal); // Debug log
@@ -75,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${project.image_url ? `<img src="${project.image_url}" alt="${project.title}" class="modal-image">` : ''}
             <h2>${project.title}</h2>
             <p class="tech-stack">${project.stack}</p>
-            <p>${project.desc}</p>
+            <div class="rich-content">${project.desc}</div>
         `;
 
         // Force styles directly via JS to bypass CSS issues
@@ -137,6 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log('Rendering project:', project.title);
                     const card = document.createElement('article');
                     card.className = 'project-card';
+                    const plainTextDesc = extractText(project.desc);
                     card.innerHTML = `
                         <div class="card-image">
                             ${project.image_url ? `<img src="${project.image_url}" alt="${project.title}" style="width:100%; height:100%; object-fit:cover;">` : '<div class="placeholder-img"></div>'}
@@ -144,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="card-content">
                             <h3>${project.title}</h3>
                             <p class="tech-stack">${project.stack}</p>
-                            <p class="card-desc">${project.desc}</p>
+                            <p class="card-desc">${plainTextDesc}</p>
                             <a href="#" class="btn secondary-btn view-details-btn">View Details</a>
                         </div>
                     `;
