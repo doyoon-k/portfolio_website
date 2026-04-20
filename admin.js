@@ -457,7 +457,6 @@ async function loadSettings() {
     if (data) {
         document.getElementById('sHeroT1').value = data.hero_title1 || '';
         document.getElementById('sHeroT2').value = data.hero_title2 || '';
-        document.getElementById('sHeroSub').value = data.hero_subtitle || '';
         document.getElementById('sAboutText').value = data.about_text || '';
         document.getElementById('sContactTitle').value = data.contact_title || '';
         document.getElementById('sContactText').value = data.contact_text || '';
@@ -480,7 +479,6 @@ settingsForm.addEventListener('submit', async (e) => {
         id: 1,
         hero_title1: document.getElementById('sHeroT1').value,
         hero_title2: document.getElementById('sHeroT2').value,
-        hero_subtitle: document.getElementById('sHeroSub').value,
         about_text: document.getElementById('sAboutText').value,
         contact_title: document.getElementById('sContactTitle').value,
         contact_text: document.getElementById('sContactText').value,

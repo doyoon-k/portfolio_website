@@ -279,9 +279,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 const h2 = document.querySelector('.hero-content h2');
                 if (h2) h2.innerText = data.hero_title2;
-                
-                const heroSub = document.querySelector('.hero-content p');
-                if (heroSub) heroSub.innerText = data.hero_subtitle;
 
                 // Update About
                 const aboutTextContainer = document.querySelector('.about-text');
