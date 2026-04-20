@@ -412,9 +412,14 @@ a {
     text-align: center;
 }
 
+.contact-container .section-title {
+    text-align: center;
+}
+
 .contact-container p {
     margin-bottom: 2rem;
     color: var(--text-secondary);
+    text-align: left;
 }
 
 .contact-form {
