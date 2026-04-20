@@ -293,9 +293,8 @@ a {
     text-align: center;
     margin-bottom: 4rem;
     position: relative;
-    display: inline-block;
-    left: 50%;
-    transform: translateX(-50%);
+    display: block;
+    width: 100%;
 }
 
 .section-title::after {
@@ -409,11 +408,6 @@ a {
 .contact-container {
     max-width: 600px;
     margin: 0 auto;
-    text-align: center;
-}
-
-.contact-container .section-title {
-    text-align: center;
 }
 
 .contact-container p {
